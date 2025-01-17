@@ -15,66 +15,66 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app)
 
-class SentimentClassifier(nn.Module):
-    def __init__(self, n_classes=5):
-        super(SentimentClassifier, self).__init__()
-        self.bert = BertModel.from_pretrained('bert-base-uncased')
-        self.drop = nn.Dropout(p=0.3)
-        self.fc = nn.Linear(self.bert.config.hidden_size, n_classes)
+# class SentimentClassifier(nn.Module):
+#     def __init__(self, n_classes=5):
+#         super(SentimentClassifier, self).__init__()
+#         self.bert = BertModel.from_pretrained('bert-base-uncased')
+#         self.drop = nn.Dropout(p=0.3)
+#         self.fc = nn.Linear(self.bert.config.hidden_size, n_classes)
 
-    def forward(self, input_ids, attention_mask):
-        output = self.bert(
-            input_ids=input_ids,
-            attention_mask=attention_mask
-        )
-        pooled_output = output.pooler_output
-        return self.fc(self.drop(pooled_output))
+#     def forward(self, input_ids, attention_mask):
+#         output = self.bert(
+#             input_ids=input_ids,
+#             attention_mask=attention_mask
+#         )
+#         pooled_output = output.pooler_output
+#         return self.fc(self.drop(pooled_output))
 
-def download_model():
-    """Download model from S3 bucket"""
-    try:
-        s3 = boto3.client('s3')
-        s3.download_file('iitmodel', 'model.tar.gz', '/tmp/model.tar.gz')
-        os.system('tar -xzf /tmp/model.tar.gz -C /tmp/')
-        logger.info("Model downloaded and extracted successfully")
-    except Exception as e:
-        logger.error(f"Error downloading model: {str(e)}")
-        raise
+# def download_model():
+#     """Download model from S3 bucket"""
+#     try:
+#         s3 = boto3.client('s3')
+#         s3.download_file('iitmodel', 'model.tar.gz', '/tmp/model.tar.gz')
+#         os.system('tar -xzf /tmp/model.tar.gz -C /tmp/')
+#         logger.info("Model downloaded and extracted successfully")
+#     except Exception as e:
+#         logger.error(f"Error downloading model: {str(e)}")
+#         raise
 
-def load_model():
-    """Load the model and tokenizer"""
-    try:
-        device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-        model = SentimentClassifier()
-        model.load_state_dict(torch.load('/tmp/best_model.pt', map_location=device))
-        model.to(device)
-        model.eval()
-        return model, tokenizer, device
-    except Exception as e:
-        logger.error(f"Error loading model: {str(e)}")
-        raise
+# def load_model():
+#     """Load the model and tokenizer"""
+#     try:
+#         device = 'cuda' if torch.cuda.is_available() else 'cpu'
+#         tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+#         model = SentimentClassifier()
+#         model.load_state_dict(torch.load('/tmp/best_model.pt', map_location=device))
+#         model.to(device)
+#         model.eval()
+#         return model, tokenizer, device
+#     except Exception as e:
+#         logger.error(f"Error loading model: {str(e)}")
+#         raise
 
-def predict_sentiment(text, model, tokenizer, device):
-    """Process text and return sentiment prediction"""
-    encoding = tokenizer.encode_plus(
-        text,
-        add_special_tokens=True,
-        max_length=128,
-        padding='max_length',
-        truncation=True,
-        return_tensors='pt'
-    )
+# def predict_sentiment(text, model, tokenizer, device):
+#     """Process text and return sentiment prediction"""
+#     encoding = tokenizer.encode_plus(
+#         text,
+#         add_special_tokens=True,
+#         max_length=128,
+#         padding='max_length',
+#         truncation=True,
+#         return_tensors='pt'
+#     )
 
-    input_ids = encoding['input_ids'].to(device)
-    attention_mask = encoding['attention_mask'].to(device)
+#     input_ids = encoding['input_ids'].to(device)
+#     attention_mask = encoding['attention_mask'].to(device)
 
-    with torch.no_grad():
-        outputs = model(input_ids, attention_mask)
-        _, prediction = torch.max(outputs, dim=1)
-        probabilities = F.softmax(outputs, dim=1)
+#     with torch.no_grad():
+#         outputs = model(input_ids, attention_mask)
+#         _, prediction = torch.max(outputs, dim=1)
+#         probabilities = F.softmax(outputs, dim=1)
 
-    return prediction.item() + 1, probabilities.cpu().numpy()[0].tolist()
+#     return prediction.item() + 1, probabilities.cpu().numpy()[0].tolist()
 
 # Download and load model at startup
 # download_model()
