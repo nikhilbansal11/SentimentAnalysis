@@ -77,8 +77,8 @@ def predict_sentiment(text, model, tokenizer, device):
     return prediction.item() + 1, probabilities.cpu().numpy()[0].tolist()
 
 # Download and load model at startup
-download_model()
-model, tokenizer, device = load_model()
+# download_model()
+# model, tokenizer, device = load_model()
 
 @app.route('/health', methods=['GET'])
 def health_check():
