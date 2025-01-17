@@ -1,10 +1,10 @@
 import os
-import boto3
-import torch
-import torch.nn as nn
-from torch.nn import functional as F
+# import boto3
+# import torch
+# import torch.nn as nn
+# from torch.nn import functional as F
 from flask import Flask, request, jsonify
-from transformers import BertTokenizer, BertModel
+# from transformers import BertTokenizer, BertModel
 import logging
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_cors import CORS
