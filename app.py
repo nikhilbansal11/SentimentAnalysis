@@ -7,12 +7,15 @@ from flask import Flask, request, jsonify
 from transformers import BertTokenizer, BertModel
 import logging
 from werkzeug.middleware.proxy_fix import ProxyFix
+from flask_cors import CORS
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 app = Flask(__name__)
+CORS(app)
 app.wsgi_app = ProxyFix(app.wsgi_app)
 
 # class SentimentClassifier(nn.Module):
