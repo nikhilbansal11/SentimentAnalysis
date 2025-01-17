@@ -89,12 +89,12 @@ def health_check():
 def predict():
     """Prediction endpoint"""
     try:
-        # data = request.get_json()
+        data = request.get_json()
         
-        # if not data or 'text' not in data:
-        #     return jsonify({'error': 'No text provided'}), 400
+        if not data or 'text' not in data:
+            return jsonify({'error': 'No text provided'}), 400
 
-        # text = data['text']
+        text = data['text']
         
         # Get prediction
         # rating, probabilities = predict_sentiment(text, model, tokenizer, device)
